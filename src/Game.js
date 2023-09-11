@@ -2,15 +2,22 @@ import Stage from "./Stage";
 import { Sprite, AnimatedSprite, Texture } from "pixi.js";
 import { gsap } from "gsap";
 import { Howler } from "howler";
+import Enemy from "./Enemy";
+import Hittest from "./Hittest";
 
 export default class Game {
   constructor(assets) {
     let myStage = new Stage();
-
+    
     this.scene = myStage.scene;
     this.scene.sortableChildren = true; //Så vi kan bruge z-index på children
     let background = myStage.bg;
     this.si = myStage.StageInfo;
+    
+    this.enemy;
+    this.enemy = new Enemy(assets, this.scene);
+
+    this.ht = new Hittest();
 
     const bg = Sprite.from(assets.background);
     background.addChild(bg);
@@ -40,12 +47,11 @@ export default class Game {
       let mXpos = event.global.x;
       mXpos > this.si.appWidth / 2 ? (ninja.scale.x = -1) : (ninja.scale.x = 1);
 
-
       //Afspilling af lyd
-      this.hitSound = new Howl ({
+      this.hitSound = new Howl({
         src: ["../assets/sound/punch.mp3"],
-        volume: .5
-      })
+        volume: 0.5,
+      });
 
       this.hitSound.play();
 
@@ -69,38 +75,40 @@ export default class Game {
         },
       });
     }); // event
+
+    //PLAY knap
+    const play = Sprite.from(assets.play);
+    play.anchor.set(0.5);
+    play.x = 512;
+    play.y = 250;
+    play.eventMode = "static";
+    play.buttonMode = true;
+    this.scene.addChild(play);
+
+    play.on("pointerdown", (event) => {
+      event.stopPropagation();
+      this.si.app.stage.eventMode = "static";
+
+      gsap.to(event.currentTarget, {
+        duration: 0.5,
+        delay: 0.2,
+        y: play.y - 350,
+        ease: "Elastic.easeInOut",
+      });
+
+      //Lyd når skiltet bliver animeret væk fra skærmen
+      let soundSwirp = new Howl({
+        src: ["../assets/sound/effekt_swish.mp3"],
+        volume: 0.2,
+      });
+
+      let timerid = setTimeout(() => {
+        soundSwirp.play();
+      }, 500);
+    }); //END event
+
+
     
-          //PLAY knap
-          const play = Sprite.from(assets.play);
-           play.anchor.set(0.5);
-           play.x = 512;
-           play.y = 250;
-           play.eventMode = "static";
-           play.buttonMode = true;
-           this.scene.addChild(play);
-    
-    
-          play.on("pointerdown", (event) => {
-            event.stopPropagation();
-            this.si.app.stage.eventMode = "static";
-    
-            gsap.to(event.currentTarget, {
-              duration: 0.5,
-              delay: 0.2,
-              y: play.y - 350,
-              ease: "Elastic.easeInOut"
-            });
-    
-            let soundSwirp = new Howl ({
-              src: ["../assets/sound/effekt_swish.mp3"],
-              volume: 0.2
-            });
-    
-            let timerid = setTimeout (()=>{
-              soundSwirp.play();
-            }, 500);
-    
-    
-          })
+
   } // END constructor
 } // END class
