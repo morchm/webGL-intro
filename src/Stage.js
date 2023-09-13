@@ -17,6 +17,7 @@ class Stage {
 
     //Tilføjer et canvas på siden:
     this.app = new Application();
+    // globalThis.__PIXI_APP__ = app;
     document.body.appendChild(this.app.view);
 
     //Baggrund til canvas:

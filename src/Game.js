@@ -1,4 +1,5 @@
 import Stage from "./Stage";
+import * as PIXI from "pixi.js";
 import { Sprite, AnimatedSprite, Texture } from "pixi.js";
 import { gsap } from "gsap";
 import { Howler } from "howler";
@@ -7,17 +8,17 @@ import Hittest from "./Hittest";
 
 export default class Game {
   constructor(assets) {
+    this.ht = new Hittest();
+
     let myStage = new Stage();
-    
+
     this.scene = myStage.scene;
     this.scene.sortableChildren = true; //Så vi kan bruge z-index på children
     let background = myStage.bg;
     this.si = myStage.StageInfo;
-    
+
     this.enemy;
     this.enemy = new Enemy(assets, this.scene);
-
-    this.ht = new Hittest();
 
     const bg = Sprite.from(assets.background);
     background.addChild(bg);
@@ -107,8 +108,34 @@ export default class Game {
       }, 500);
     }); //END event
 
+    let ticker = PIXI.Ticker.shared;
 
-    
+    ticker.add(() => {
+      if (this.enemy != undefined) {
+        this.enemy.enemies.forEach((_enemy) => {
+          if (this.ht.checkme(ninja, _enemy.getChildAt(1)) && _enemy.alive == true) {
+            let enemyDieTimeLine = gsap.timeline({
+              onComplete: () => {
+                this.scene.removeChild(enemy);
+              },
+            }); //END timeline
 
+            enemyDieTimeLine.to(_enemy, {
+              y: 300,
+              duration: 0.7,
+              ease: "Circ.easeOut",
+            });
+
+            enemyDieTimeLine.to(_enemy, {
+              y: 1200,
+              duration: 0.5,
+              ease: "Circ.easeIn",
+            });
+
+            _enemy.alive = false;
+          }
+        }); //End foreach
+      } //End if
+    }); //End ticker
   } // END constructor
 } // END class

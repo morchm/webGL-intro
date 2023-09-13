@@ -2,7 +2,7 @@ export default class Hittest {
   constructor() {}
 
   checkme(a, b) {
-    let ab = a.getBounds();
+    let ab = a.getBounds();//finder ud af højde og bredde på et objekt
     let bb = b.getBounds();
 
     return (
