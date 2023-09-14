@@ -9,8 +9,9 @@ import Hittest from "./Hittest";
 export default class Game {
   constructor(assets) {
     this.ht = new Hittest();
-
     let myStage = new Stage();
+
+    this.SoundArray = ["ia1", "ia2"];
 
     this.scene = myStage.scene;
     this.scene.sortableChildren = true; //Så vi kan bruge z-index på children
@@ -110,10 +111,13 @@ export default class Game {
 
     let ticker = PIXI.Ticker.shared;
 
-    ticker.add(() => {
+    ticker.add((delta) => {
       if (this.enemy != undefined) {
         this.enemy.enemies.forEach((_enemy) => {
-          if (this.ht.checkme(ninja, _enemy.getChildAt(1)) && _enemy.alive == true) {
+          if (
+            this.ht.checkme(ninja, _enemy.getChildAt(1)) &&
+            _enemy.alive == true
+          ) {
             let enemyDieTimeLine = gsap.timeline({
               onComplete: () => {
                 this.scene.removeChild(enemy);
@@ -137,5 +141,13 @@ export default class Game {
         }); //End foreach
       } //End if
     }); //End ticker
+
+    // ---- NINJA HITAREA ----
+    this.hitareaNinja = new PIXI.Graphics();
+    this.hitareaNinja.beginFill(0xde3249);
+    this.hitareaNinja.drawRect(500 - 150, 550, 300, 200);
+    this.hitareaNinja.alpha = 0.5;
+    this.hitareaNinja.endFill();
+    this.scene.addChild(this.hitareaNinja);
   } // END constructor
 } // END class

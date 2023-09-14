@@ -82,6 +82,10 @@ class Enemy {
         });
 
     }); //END RandomInterval
+
+
+    this.enemyContainer.attack = true;
+
   } //END constructor
 
   get enemies (){
